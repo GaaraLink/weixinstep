@@ -1,220 +1,106 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>微信步数同步助手</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Heroicons 图标库 -->
-    <script src="https://unpkg.com/@heroicons/vue/20/solid.js"></script>
-    <style>
-        @keyframes float {
-            0% {
-                transform: translateY(0px);
-            }
-            50% {
-                transform: translateY(-20px);
-            }
-            100% {
-                transform: translateY(0px);
-            }
-        }
-
-        .float-animation {
-            animation: float 6s ease-in-out infinite;
-        }
-
-        /* 弹窗的样式 */
-        .modal-overlay {
-            background: rgba(0, 0, 0, 0.6);
-        }
-    </style>
-</head>
-<body class="bg-gradient-to-br from-blue-50 to-purple-50 min-h-screen">
-<div id="app" class="container mx-auto px-4 py-8">
-    <!-- 头部插画 -->
-    <div class="max-w-2xl mx-auto mb-12 text-center">
-        <div class="float-animation">
-            <svg class="w-64 h-64 mx-auto" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M100 200C155.228 200 200 155.228 200 100C200 44.7715 155.228 0 100 0C44.7715 0 0 44.7715 0 100C0 155.228 44.7715 200 100 200Z"
-                      fill="#A5B4FC"/>
-                <path d="M60 120L80 140L140 80" stroke="white" stroke-width="8" stroke-linecap="round"/>
-                <path d="M100 60V100L120 120" stroke="white" stroke-width="8" stroke-linecap="round"/>
-            </svg>
-        </div>
-        <h1 class="text-4xl font-bold text-gray-800 mt-6 mb-2">
-            微信步数同步助手
-        </h1>
-        <p class="text-gray-600">轻松同步您的运动数据到微信平台</p>
-    </div>
-
-    <div class="max-w-md mx-auto bg-white rounded-2xl shadow-lg p-8">
-        <!-- 步骤指示器 -->
-        <div class="flex justify-center mb-8">
-            <div class="flex items-center">
-                <!-- Tab 1 -->
-                <div
-                    :class="{'w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white': currentTab === 1, 'w-8 h-8 bg-blue-200 rounded-full flex items-center justify-center text-white': currentTab !== 1}">
-                    1
-                </div>
-                <div class="w-16 h-1 bg-blue-200"></div>
-                <!-- Tab 2 -->
-                <div
-                    :class="{'w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white': currentTab === 2, 'w-8 h-8 bg-blue-200 rounded-full flex items-center justify-center text-white': currentTab !== 2}">
-                    2
-                </div>
+<div class="max-w-md mx-auto bg-white rounded-2xl shadow-lg p-8">
+    <!-- 步骤指示器 -->
+    <div class="flex justify-center mb-8">
+        <div class="flex items-center">
+            <!-- Tab 1 -->
+            <div
+                :class="{'w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white': currentTab === 1, 'w-8 h-8 bg-blue-200 rounded-full flex items-center justify-center text-white': currentTab !== 1}">
+                1
             </div>
-        </div>
-
-        <!-- Tab 内容 -->
-        <div v-if="currentTab === 1">
-            <!-- 输入表单 -->
-            <form @submit.prevent="submitForm" class="space-y-6">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
-                        Zeep平台手机号码或邮箱
-                        <!-- 点击问号图标，显示提示信息 -->
-                        <button
-                            type="button"
-                            @click="showHint = true"
-                            class="ml-2 text-blue-500 hover:text-blue-700 focus:outline-none"
-                            title="点击查看说明">
-                            <heroicons-question-mark-circle-20-solid class="w-5 h-5"/>
-                        </button>
-                    </label>
-                    <div class="relative">
-                        <input
-                            type="text"
-                            v-model="form.phone"
-                            class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"
-                            placeholder="请输入注册手机号或邮箱">
-                        <span class="absolute right-3 top-3 text-gray-400">
-                            <heroicons-phone-20-solid class="w-6 h-6"/>
-                        </span>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                        账户密码
-                    </label>
-                    <div class="relative">
-                        <input
-                            type="password"
-                            v-model="form.password"
-                            class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"
-                            placeholder="请输入登录密码">
-                        <span class="absolute right-3 top-3 text-gray-400">
-                            <heroicons-lock-closed-20-solid class="w-6 h-6"/>
-                        </span>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                        目标步数
-                    </label>
-                    <div class="relative">
-                        <input
-                            type="number"
-                            v-model.number="form.step"
-                            min="1"
-                            max="99999"
-                            class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"
-                            placeholder="请输入1-99999之间的步数">
-                        <span class="absolute right-3 top-3 text-gray-400">
-                            <heroicons-footsteps-20-solid class="w-6 h-6"/>
-                        </span>
-                    </div>
-                </div>
-
-                <!-- 提交按钮 -->
-                <button
-                    type="submit"
-                    :disabled="loading"
-                    class="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 rounded-lg font-medium hover:opacity-90 transition-all flex items-center justify-center">
-                    <span v-if="!loading">立即同步步数</span>
-                    <svg v-else class="animate-spin h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
-                         viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor"
-                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                </button>
-            </form>
-        </div>
-
-        <div v-else-if="currentTab === 2">
-            <!-- Tab 2 结果显示 -->
-            <div class="text-center p-4">
-                <div class="mb-4" :class="result.code === 200 ? 'text-green-500' : 'text-red-500'">
-                    <heroicons-check-circle-20-solid v-if="result.code === 200" class="w-12 h-12 mx-auto"/>
-                    <heroicons-x-circle-20-solid v-else class="w-12 h-12 mx-auto"/>
-                </div>
-                <p class="text-lg font-medium">{{ result.msg }}</p>
-                <p class="text-sm text-gray-500 mt-2">同步步数：{{ form.step }}</p>
-            </div>
-            <div class="mt-4 text-center">
-                <button @click="resetForm"
-                        class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-                    返回重新填写
-                </button>
+            <div class="w-16 h-1 bg-blue-200"></div>
+            <!-- Tab 2 -->
+            <div
+                :class="{'w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white': currentTab === 2, 'w-8 h-8 bg-blue-200 rounded-full flex items-center justify-center text-white': currentTab !== 2}">
+                2
             </div>
         </div>
     </div>
-</div>
 
-<!-- 提示弹窗 -->
-<div v-if="showHint" class="fixed inset-0 flex items-center justify-center modal-overlay z-50">
-    <div class="bg-white rounded-lg p-6 w-96 shadow-lg">
-        <h3 class="text-lg font-semibold text-gray-800 mb-4">操作指导</h3>
-        <p class="text-gray-600 mb-4">
-            您需要使用 Zeep 软件的账号和密码，而非微信账号。
-            <br>
-            请按照以下步骤进行操作：
-            <ol class="list-decimal list-inside mt-2 text-gray-600">
-                <li>下载并安装 Zeep 客户端。</li>
-                <li>完成注册并登录 Zeep 账号。</li>
-                <li>在 Zeep 中找到“第三方接入”功能并绑定微信步数。</li>
-            </ol>
-        </p>
-        <div class="text-right">
-            <button @click="showHint = false" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-                我知道了
+    <!-- Tab 内容 -->
+    <div v-if="currentTab === 1">
+        <!-- 输入表单 -->
+        <form @submit.prevent="submitForm" class="space-y-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Zeep平台手机号码或邮箱
+                </label>
+                <div class="relative">
+                    <input
+                        type="text"
+                        v-model="form.phone"
+                        class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"
+                        placeholder="请输入注册手机号或邮箱">
+                    <span class="absolute right-3 top-3 text-gray-400">
+                        <heroicons-phone-20-solid class="w-6 h-6"/>
+                    </span>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    账户密码
+                </label>
+                <div class="relative">
+                    <input
+                        type="password"
+                        v-model="form.password"
+                        class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"
+                        placeholder="请输入登录密码">
+                    <span class="absolute right-3 top-3 text-gray-400">
+                        <heroicons-lock-closed-20-solid class="w-6 h-6"/>
+                    </span>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    目标步数
+                </label>
+                <div class="relative">
+                    <input
+                        type="number"
+                        v-model.number="form.step"
+                        min="1"
+                        max="99999"
+                        class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"
+                        placeholder="请输入1-99999之间的步数">
+                    <span class="absolute right-3 top-3 text-gray-400">
+                        <heroicons-footsteps-20-solid class="w-6 h-6"/>
+                    </span>
+                </div>
+            </div>
+
+            <!-- 提交按钮 -->
+            <button
+                type="submit"
+                :disabled="loading"
+                class="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 rounded-lg font-medium hover:opacity-90 transition-all flex items-center justify-center">
+                <span v-if="!loading">立即同步步数</span>
+                <svg v-else class="animate-spin h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
+                     viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+            </button>
+        </form>
+    </div>
+
+    <div v-else-if="currentTab === 2">
+        <!-- Tab 2 结果显示 -->
+        <div class="text-center p-4">
+            <div class="mb-4" :class="result.code === 200 ? 'text-green-500' : 'text-red-500'">
+                <heroicons-check-circle-20-solid v-if="result.code === 200" class="w-12 h-12 mx-auto"/>
+                <heroicons-x-circle-20-solid v-else class="w-12 h-12 mx-auto"/>
+            </div>
+            <p class="text-lg font-medium">{{ result.msg }}</p>
+            <p class="text-sm text-gray-500 mt-2">同步步数：{{ form.step }}</p>
+        </div>
+        <div class="mt-4 text-center">
+            <button @click="resetForm"
+                    class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+                返回重新填写
             </button>
         </div>
     </div>
 </div>
-
-<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-<script>
-    const {createApp} = Vue
-
-    createApp({
-        data() {
-            return {
-                currentTab: 1, // 当前 Tab 页
-                form: {
-                    phone: '',
-                    password: '',
-                    step: 1
-                },
-                loading: false,
-                result: null, // 提交结果
-                showHint: false // 控制弹窗显示
-            }
-        },
-        methods: {
-            async submitForm() {
-                // 表单提交逻辑...
-            },
-            resetForm() {
-                this.currentTab = 1
-                this.form = {phone: '', password: '', step: 1}
-                this.result = null
-            }
-        }
-    }).mount('#app')
-</script>
-</body>
-</html>
