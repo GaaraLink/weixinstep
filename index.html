@@ -329,6 +329,7 @@
                 this.currentTab = 1
                 this.form = {phone: '', password: '', step: 1}
                 this.result = null
+                this.loadFromLocalStorage() // 重新加载缓存的数据
             }
         },
         mounted() {
