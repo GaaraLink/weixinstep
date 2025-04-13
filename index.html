@@ -42,7 +42,7 @@
     <!-- 头部插画 -->
     <div class="max-w-2xl mx-auto mb-12 text-center">
         <div class="float-animation">
-            <svg class="w-64 h-64 mx-auto" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg class="w-64 h-40 mx-auto" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M100 200C155.228 200 200 155.228 200 100C200 44.7715 155.228 0 100 0C44.7715 0 0 44.7715 0 100C0 155.228 44.7715 200 100 200Z"
                       fill="#A5B4FC"/>
                 <path d="M60 120L80 140L140 80" stroke="white" stroke-width="8" stroke-linecap="round"/>
@@ -173,13 +173,7 @@
                     </svg>
                 </button>
 
-                <!-- 清除缓存按钮 -->
-                <button
-                        type="button"
-                        @click="clearStorage"
-                        class="w-full bg-red-500 text-white py-3 rounded-lg font-medium hover:bg-red-600 transition-all flex items-center justify-center mt-4">
-                    清除保存的账号密码
-                </button>
+
             </form>
         </div>
 
@@ -221,9 +215,14 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                 </svg>
             </button>
-            <h3 class="text-xl font-bold mb-4">使用说明</h3>
+            <h3 class="text-xl font-bold mb-4">帮助</h3>
             <ol class="list-decimal list-outside space-y-3 pl-5 text-gray-700">
-                <li>下载并安装最新版Zeep Life客户端（原小米运动）</li>
+                <li>下载并安装最新版Zeep客户端（原小米运动）
+                    <div class="mt-6 text-center">
+                        <a href="https://apps.apple.com/us/app/zepp-formerly-amazfit/id1127269366" target="_blank"
+                           class="text-blue-500 hover:underline">IOS下载链接</a>
+                    </div>
+                </li>
                 <li>打开Zeep客户端，进入【我的】→【三方数据绑定】</li>
                 <li>绑定微信平台并保持登录状态</li>
                 <li>返回本页面输入您在Zeep平台的账号密码</li>
@@ -231,12 +230,15 @@
             </ol>
             <div class="mt-6 p-4 bg-blue-50 rounded-lg text-sm">
                 <p class="text-blue-800 font-medium">⚠️ 重要提示：</p>
-                <p class="mt-1 text-blue-700">此处输入的账号密码是您在Zeep Life平台（原小米运动）的登录凭证，不是微信账号密码！</p>
+                <p class="mt-1 text-blue-700">此处输入的账号密码是您在Zeep平台（原小米运动）的登录凭证，不是微信账号密码！</p>
             </div>
-            <div class="mt-6 text-center">
-                <a href="https://apps.apple.com/us/app/zepp-formerly-amazfit/id1127269366" target="_blank"
-                   class="text-blue-500 hover:underline">IOS下载链接</a>
-            </div>
+            <!-- 清除缓存按钮 -->
+            <button
+                    type="button"
+                    @click="clearStorage"
+                    class="w-full bg-red-500 text-white py-3 rounded-lg font-medium hover:bg-red-600 transition-all flex items-center justify-center mt-4">
+                清除保存的账号密码
+            </button>
         </div>
     </div>
 </div>
