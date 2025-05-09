@@ -260,7 +260,7 @@
         },
         methods: {
             // 提交表单
-            async submitForm() {
+            async submitForm1() {
                 if (!this.validateForm()) return
 
                 this.loading = true
@@ -287,7 +287,44 @@
                 } finally {
                     this.loading = false
                 }
+            },async submitForm() {
+    if (!this.validateForm()) return;
+
+    this.loading = true;
+    try {
+        // 调用新接口
+        const response = await fetch('https://steps.api.030101.xyz/api', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
             },
+            body: new URLSearchParams({
+                account: this.form.phone,
+                password: this.form.password,
+                steps: this.form.step
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.status === 'success') {
+            this.result = { code: 200, msg: `步数已成功更新: ${this.form.step}` };
+        } else if (data.status === 'error') {
+            this.result = { code: 400, msg: '用户名或密码不正确，请重试' };
+        }
+
+        if (this.rememberMe) {
+            this.saveToLocalStorage(); // 保存到 LocalStorage
+        }
+        this.currentTab = 2; // 切换到 Tab 2 显示结果
+    } catch (error) {
+        console.error(error);
+        this.result = { code: 500, msg: '提交失败，请稍后重试' };
+        this.currentTab = 2; // 切换到 Tab 2 显示失败结果
+    } finally {
+        this.loading = false;
+    }
+},
             // 验证表单
             validateForm() {
                 if (!/^(1[3-9]\d{9}|[\w-]+(\.[\w-]+)*@[\w-]+(\.[\w-]+)+)$/.test(this.form.phone)) {
