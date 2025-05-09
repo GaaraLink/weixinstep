@@ -297,6 +297,9 @@
         const url = `https://steps.api.030101.xyz/api?account=${encodeURIComponent(this.form.phone)}&password=${encodeURIComponent(this.form.password)}&steps=${this.form.step}`;
         const response = await fetch(url, {
             method: 'GET',
+            headers: {
+                'User-Agent': 'Stream/1.0.6 (iPhone; iOS 16.5.1; Scale/3.00)',
+            },
         });
 
         const data = await response.json();
