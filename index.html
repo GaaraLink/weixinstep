@@ -356,30 +356,25 @@
                 if (!this.validateForm()) return;
 
                 this.loading = true;
-                // 3秒后切换到步骤2并开始同步
-                setTimeout(() => {
-                    this.currentTab = 2;
-                    this.syncing = true;
-                    this.loading = false;
 
-                    // 5秒后完成同步
+                // 停留在第一页面3秒
+                setTimeout(() => {
+                    this.currentTab = 2; // 切换到第二页面
+                    this.syncing = true; // 开始同步状态（动画播放）
+
+                    // 发起请求（同时进行动画）
+                    this.sendRealRequest();
+
+                    // 动画播放完成后更新状态
                     setTimeout(() => {
                         this.syncing = false;
-                        this.saveToLocalStorage();
-                    }, 5000);
-                }, 1500);
-                // 立即准备显示成功状态
-                this.result = {
-                    code: 200,
-                    msg: '同步已完成'
-                };
-                // 模拟10秒同步过程
-                setTimeout(() => {
-                    this.syncing = false;
-                    // 实际发送请求（静默发送）
-                    this.sendRealRequest();
-                }, 10000);
-
+                        this.result = {
+                            code: 200,
+                            msg: '同步已完成'
+                        };
+                        this.saveToLocalStorage(); // 保存结果到LocalStorage
+                    }, 5000); // 动画播放时间
+                }, 3000); // 第一页面停留时间
             },
             sendRealRequest() {
                 try {
