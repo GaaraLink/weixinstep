@@ -10,12 +10,18 @@
     <style>
         /* 新增旋转动画 */
         @keyframes rotating {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(-360deg);
+            }
         }
+
         .animate-rotating {
             animation: rotating 2s linear infinite;
         }
+
         /* 圆形绘制动画 */
         @keyframes drawCircle {
             0% {
@@ -47,6 +53,7 @@
         .animate-drawCheck {
             animation: drawCheck 0.4s 0.6s ease-out forwards;
         }
+
         @keyframes float {
             0% {
                 transform: translateY(0px);
@@ -73,6 +80,10 @@
                 opacity: 1;
                 transform: scale(1);
             }
+        }
+
+        .container {
+            min-height: 100px; /* 设置最小高度 */
         }
     </style>
 </head>
@@ -230,13 +241,13 @@
                                 <path stroke-linecap="round" stroke-linejoin="round"
                                       d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                             </svg>
-                            <p class="text-lg font-large mt-4">正在同步中...</p>
-                            <p class="text-sm text-gray-500 mt-2">预计需要10秒完成</p>
+                            <p class="text-lg font-large mt-4 font-bold">正在同步中...</p>
                         </div>
 
                         <!-- 同步成功状态 -->
                         <div v-else>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 mx-auto" fill="currentColor" viewBox="0 0 24 24">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 mx-auto" fill="currentColor"
+                                 viewBox="0 0 24 24">
                                 <path class="opacity-0 animate-drawCircle"
                                       d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20"
                                       style="fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round"/>
@@ -245,13 +256,15 @@
                                       style="fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"/>
                             </svg>
                             <p class="text-lg font-large mt-4">{{ result.msg }}</p>
-                            <p class="text-sm text-gray-500 mt-2">同步步数：{{ form.step }}</p>
+                            <p class="text-lg text-gray-500 mt-4">同步步数：{{ form.step }}</p>
                         </div>
                     </div>
-                    <button v-if="!syncing" @click="resetForm"
-                            class="mt-6 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-                        返回重新填写
-                    </button>
+                    <div class="container">
+                        <button v-if="!syncing" @click="resetForm"
+                                class="mt-6 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+                            返回重新填写
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -354,7 +367,7 @@
                         this.syncing = false;
                         this.saveToLocalStorage();
                     }, 5000);
-                }, 3000);
+                }, 1500);
                 // 立即准备显示成功状态
                 this.result = {
                     code: 200,
