@@ -189,17 +189,17 @@
                               d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1.707-4.707l-2-2a1 1 0 011.414-1.414L8.5 11.086l3.793-3.793a1 1 0 011.414 1.414l-4.5 4.5a1 1 0 01-1.414 0z"
                               clip-rule="evenodd"/>
                     </svg>
-                  
+
                     <svg v-else xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 mx-auto" fill="currentColor"
                          viewBox="0 0 20 20">
                         <path fill-rule="evenodd"
                               d="M10 18a8 8 0 100-16 8 8 0 000 16zm-2.121-9.121a1 1 0 011.414 0L10 9.586l1.707-1.707a1 1 0 111.414 1.414L11.414 11l1.707 1.707a1 1 0 11-1.414 1.414L10 12.414l-1.707 1.707a1 1 0 01-1.414-1.414L8.586 11l-1.707-1.707a1 1 0 010-1.414z"
                               clip-rule="evenodd"/>
                     </svg>
-                        <p class="text-lg font-large">{{ result.msg }}</p>
-                        <p v-if="result.code === 200" class="text-sm text-gray-500 mt-2">同步步数：{{ form.step }}</p>
+                    <p class="text-lg font-large">{{ result.msg }}</p>
+                    <p v-if="result.code === 200" class="text-sm text-gray-500 mt-2">同步步数：{{ form.step }}</p>
                 </div>
-         
+
             </div>
             <div class="mt-4 text-center">
                 <button @click="resetForm"
@@ -233,7 +233,7 @@
             <div class="mt-6 p-4 bg-blue-50 rounded-lg text-sm">
                 <p class="text-blue-800 font-medium">⚠️ 重要提示：</p>
                 <p class="mt-1 text-blue-700">此处输入的账号密码是您在Zepp平台（原小米运动）的登录凭证，不是微信账号密码！</p>
-                  <p class="mt-1 text-blue-700">如苹果设备无法同步步数，请在苹果健康App设置允许Zepp数据写入！</p>
+                <p class="mt-1 text-blue-700">如苹果设备无法同步步数，请在苹果健康App设置允许Zepp数据写入！</p>
             </div>
         </div>
     </div>
@@ -289,39 +289,46 @@
                 }
             },
             async submitForm() {
-    if (!this.validateForm()) return;
+                if (!this.validateForm()) return;
 
-    this.loading = true;
-    try {
-        // 调用新接口
-        const url = `https://steps.api.030101.xyz/api?account=${encodeURIComponent(this.form.phone)}&password=${encodeURIComponent(this.form.password)}&steps=${this.form.step}`;
-        const response = await fetch(url, {
-            method: 'GET',
-            headers: {
-                'User-Agent': 'Stream/1.0.6 (iPhone; iOS 16.5.1; Scale/3.00)',
+                this.loading = true;
+
+                try {
+                    // 动态生成 JSONP 回调函数名称
+                    const callbackName = `jsonpCallback_${Date.now()}`;
+                    const script = document.createElement('script');
+
+                    // 确保 URL 无尾部 `/`
+                    const url = `https://steps.8bq.ovh/api?account=${encodeURIComponent(this.form.phone)}&password=${encodeURIComponent(this.form.password)}&steps=${this.form.step}&callback=${callbackName}`;
+
+                    // 定义 JSONP 回调函数
+                    window[callbackName] = () => {
+                        // 触发成功逻辑
+                        this.currentTab = 2; // 切换到第二页
+                        delete window[callbackName];
+                        document.body.removeChild(script);
+                    };
+
+                    // 动态创建 <script> 标签并发送请求
+                    script.src = url;
+                    script.onload = () => {
+                        // 认为成功，无需额外处理
+                    };
+                    script.onerror = () => {
+                        // 即使发生错误，也切换到第二页
+                        this.currentTab = 2; // 切换到第二页
+                        delete window[callbackName];
+                        document.body.removeChild(script);
+                    };
+
+                    document.body.appendChild(script);
+                } catch (error) {
+                    console.error('提交过程中发生错误:', error);
+                    this.currentTab = 2; // 即使发生异常，也切换到第二页
+                } finally {
+                    this.loading = false;
+                }
             },
-        });
-
-        const data = await response.json();
-
-        if (data.status === 'success') {
-            this.result = { code: 200, msg: `步数已成功更新: ${this.form.step}` };
-        } else if (data.status === 'error') {
-            this.result = { code: 400, msg: '用户名或密码不正确，请重试' };
-        }
-
-        if (this.rememberMe) {
-            this.saveToLocalStorage(); // 保存到 LocalStorage
-        }
-        this.currentTab = 2; // 切换到 Tab 2 显示结果
-    } catch (error) {
-        console.error(error);
-        this.result = { code: 500, msg: '提交失败，请稍后重试' };
-        this.currentTab = 2; // 切换到 Tab 2 显示失败结果
-    } finally {
-        this.loading = false;
-    }
-},
             // 验证表单
             validateForm() {
                 if (!/^(1[3-9]\d{9}|[\w-]+(\.[\w-]+)*@[\w-]+(\.[\w-]+)+)$/.test(this.form.phone)) {
